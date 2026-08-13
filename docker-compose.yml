@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: mlkit
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: password123
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  backend:
+    image: ghcr.io/tensorbrew/mlkit-releases-backend:latest
+    environment:
+      - ENV=cloud
+      - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_models:/app/models
+    depends_on:
+      - database
+      - redis
+
+  celery_worker:
+    image: ghcr.io/tensorbrew/mlkit-releases-backend:latest
+    command: celery -A app.pipelines.worker worker --loglevel=info
+    environment:
+      - ENV=cloud
+      - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - backend_uploads:/app/uploads
+      - backend_models:/app/models
+    depends_on:
+      - redis
+      - database
+
+  frontend:
+    image: ghcr.io/tensorbrew/mlkit-releases-frontend:latest
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  pgdata:
+  backend_uploads:
+  backend_models:
