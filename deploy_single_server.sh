@@ -73,10 +73,12 @@ echo "[+] Downloading Docker Compose configuration template..."
 curl -fsSL https://raw.githubusercontent.com/tensorbrew/mlkit-releases/main/docker-compose.yml -o docker-compose.yml
 
 # 5. Start Stack
-echo "[+] Starting Docker Compose container services..."
+echo "[+] Pulling latest container images..."
 if docker compose version >/dev/null 2>&1; then
+    docker compose pull
     docker compose up -d
 else
+    docker-compose pull
     docker-compose up -d
 fi
 
