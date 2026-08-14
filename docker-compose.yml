@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   database:
-    image: postgres:15-alpine
+    image: postgres:15.5-alpine
     environment:
       POSTGRES_DB: mlkit
       POSTGRES_USER: admin
@@ -13,7 +13,7 @@ services:
       - "5432:5432"
 
   redis:
-    image: redis:7-alpine
+    image: redis:7.2.3-alpine
     ports:
       - "6379:6379"
 
@@ -23,6 +23,7 @@ services:
       - ENV=cloud
       - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
       - REDIS_URL=redis://redis:6379/0
+      - APP_VERSION=${APP_VERSION:-0.1.22}
     volumes:
       - backend_uploads:/app/uploads
       - backend_models:/app/models
@@ -37,6 +38,7 @@ services:
       - ENV=cloud
       - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
       - REDIS_URL=redis://redis:6379/0
+      - APP_VERSION=${APP_VERSION:-0.1.22}
     volumes:
       - backend_uploads:/app/uploads
       - backend_models:/app/models
