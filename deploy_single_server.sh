@@ -82,6 +82,24 @@ else
     docker-compose up -d
 fi
 
+echo "[+] Waiting for Python virtual environment and package installation to complete..."
+echo "[*] Tailing backend initialization logs (this may take a few minutes on first run):"
+if docker compose version >/dev/null 2>&1; then
+    docker compose logs -f backend | while read -r line; do
+        echo "$line"
+        if [[ "$line" == *"Python packages ready!"* ]]; then
+            break
+        fi
+    done
+else
+    docker-compose logs -f backend | while read -r line; do
+        echo "$line"
+        if [[ "$line" == *"Python packages ready!"* ]]; then
+            break
+        fi
+    done
+fi
+
 echo "========================================================"
 echo "[+] MLKit Deployment Completed Successfully!"
 if [ -n "$DOMAIN" ]; then
