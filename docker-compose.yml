@@ -23,25 +23,27 @@ services:
       - ENV=cloud
       - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
       - REDIS_URL=redis://redis:6379/0
-      - APP_VERSION=${APP_VERSION:-0.1.26}
+      - APP_VERSION=${APP_VERSION:-0.1.27}
     volumes:
       - backend_uploads:/app/uploads
       - backend_models:/app/models
+      - backend_venv:/app/venv
     depends_on:
       - database
       - redis
 
   celery_worker:
     image: ghcr.io/tensorbrew/mlkit-releases-backend:latest
-    command: celery -A app.pipelines.worker worker --loglevel=info
+    command: worker celery -A app.pipelines.worker worker --loglevel=info
     environment:
       - ENV=cloud
       - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
       - REDIS_URL=redis://redis:6379/0
-      - APP_VERSION=${APP_VERSION:-0.1.26}
+      - APP_VERSION=${APP_VERSION:-0.1.27}
     volumes:
       - backend_uploads:/app/uploads
       - backend_models:/app/models
+      - backend_venv:/app/venv
     depends_on:
       - redis
       - database
@@ -57,3 +59,4 @@ volumes:
   pgdata:
   backend_uploads:
   backend_models:
+  backend_venv:
