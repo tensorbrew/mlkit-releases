@@ -30,15 +30,11 @@ fi
 # 2. Setup Environment Configuration (.env)
 ENV_FILE="backend/.env"
 if [ ! -f "$ENV_FILE" ]; then
-    echo "[-] Creating production .env file with secure credentials..."
-    POSTGRES_PASS=$(openssl rand -hex 16)
-    REDIS_PASS=$(openssl rand -hex 16)
-    
+    echo "[-] Creating production .env file..."
     mkdir -p backend
     cat <<EOF > "$ENV_FILE"
 ENV=cloud
-DATABASE_URL=postgresql://admin:${POSTGRES_PASS}@database:5432/mlkit
-REDIS_URL=redis://::${REDIS_PASS}@redis:6379/0
+DATABASE_URL=sqlite:////app/data/mlkit.db
 EOF
     echo "[+] Production .env file created successfully!"
 else
@@ -82,19 +78,19 @@ else
     docker-compose up -d
 fi
 
-echo "[+] Waiting for Python virtual environment and package installation to complete..."
-echo "[*] Tailing backend initialization logs (this may take a few minutes on first run):"
+echo "[+] Waiting for Python backend and package installation to complete..."
+echo "[*] Tailing backend initialization logs:"
 if docker compose version >/dev/null 2>&1; then
     docker compose logs -f backend | while read -r line; do
         echo "$line"
-        if [[ "$line" == *"Python packages ready!"* ]]; then
+        if [[ "$line" == *"Custom packages setup complete!"* ]]; then
             break
         fi
     done
 else
     docker-compose logs -f backend | while read -r line; do
         echo "$line"
-        if [[ "$line" == *"Python packages ready!"* ]]; then
+        if [[ "$line" == *"Custom packages setup complete!"* ]]; then
             break
         fi
     done

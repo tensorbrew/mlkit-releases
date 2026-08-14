@@ -1,52 +1,17 @@
 version: '3.8'
 
 services:
-  database:
-    image: postgres:15.5-alpine
-    environment:
-      POSTGRES_DB: mlkit
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password123
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-
-  redis:
-    image: redis:7.2.3-alpine
-    ports:
-      - "6379:6379"
-
   backend:
     image: ghcr.io/tensorbrew/mlkit-releases-backend:latest
     environment:
       - ENV=cloud
-      - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
-      - REDIS_URL=redis://redis:6379/0
-      - APP_VERSION=${APP_VERSION:-0.1.28}
+      - DATABASE_URL=sqlite:////app/data/mlkit.db
+      - APP_VERSION=${APP_VERSION:-0.1.29}
     volumes:
       - backend_uploads:/app/uploads
       - backend_models:/app/models
       - backend_venv:/app/venv
-    depends_on:
-      - database
-      - redis
-
-  celery_worker:
-    image: ghcr.io/tensorbrew/mlkit-releases-backend:latest
-    command: worker celery -A app.pipelines.worker worker --loglevel=info
-    environment:
-      - ENV=cloud
-      - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
-      - REDIS_URL=redis://redis:6379/0
-      - APP_VERSION=${APP_VERSION:-0.1.28}
-    volumes:
-      - backend_uploads:/app/uploads
-      - backend_models:/app/models
-      - backend_venv:/app/venv
-    depends_on:
-      - redis
-      - database
+      - backend_data:/app/data
 
   frontend:
     image: ghcr.io/tensorbrew/mlkit-releases-frontend:latest
@@ -56,7 +21,7 @@ services:
       - backend
 
 volumes:
-  pgdata:
   backend_uploads:
   backend_models:
   backend_venv:
+  backend_data:
