@@ -23,7 +23,7 @@ services:
       - ENV=cloud
       - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
       - REDIS_URL=redis://redis:6379/0
-      - APP_VERSION=${APP_VERSION:-0.1.25}
+      - APP_VERSION=${APP_VERSION:-0.1.21}
     volumes:
       - backend_uploads:/app/uploads
       - backend_models:/app/models
@@ -38,7 +38,7 @@ services:
       - ENV=cloud
       - DATABASE_URL=postgresql://admin:password123@database:5432/mlkit
       - REDIS_URL=redis://redis:6379/0
-      - APP_VERSION=${APP_VERSION:-0.1.25}
+      - APP_VERSION=${APP_VERSION:-0.1.21}
     volumes:
       - backend_uploads:/app/uploads
       - backend_models:/app/models
